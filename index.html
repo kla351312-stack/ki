@@ -66,6 +66,30 @@
             margin-top: 5px;
         }
 
+        /* Welcome Announcement Box */
+        .welcome-box {
+            background: rgba(255, 62, 62, 0.05);
+            border: 1px solid rgba(255, 62, 62, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .welcome-box p {
+            color: #ffb3b3;
+            font-size: 1rem;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .welcome-box i {
+            color: var(--primary-color);
+            margin-right: 6px;
+        }
+
         .tabs {
             display: flex;
             background: var(--card-dark);
@@ -217,6 +241,35 @@
             animation: spin 1s linear infinite;
         }
 
+        /* Guide & Info Section */
+        .guide-box {
+            background: #111420;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #1f2336;
+            margin-bottom: 20px;
+        }
+
+        .guide-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guide-box ol {
+            padding-left: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .guide-box li {
+            margin-bottom: 6px;
+        }
+
+        /* Contact & Community Section */
         .contact-box {
             background: var(--card-dark);
             border-radius: 12px;
@@ -313,11 +366,18 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <div class="container">
+        <!-- Brand Header -->
         <div class="brand-header">
             <h1><span>KL</span> หาคีย์</h1>
             <p>ระบบข้ามลิงก์รับคีย์ตัวรัน และค้นหาสคริปต์อัตโนมัติ</p>
         </div>
 
+        <!-- Welcome Message for KLA -->
+        <div class="welcome-box">
+            <p><i class="fa-solid fa-bullhorn"></i> สวัสดีชาว KLA ทุกท่าน ยินดีต้อนรับและขอขอบคุณที่เข้ามาใช้สคริปต์/เว็บไซต์ของเราครับ</p>
+        </div>
+
+        <!-- Tabs Navigation -->
         <div class="tabs">
             <button class="tab-btn active" id="btn-bypass" onclick="switchTab('bypass')">
                 <i class="fa-solid fa-key"></i> Bypass Key ตัวรัน
@@ -327,8 +387,9 @@
             </button>
         </div>
 
+        <!-- Content Card -->
         <div class="content-card">
-            <!-- Bypass Tab -->
+            <!-- Bypass Tab Content -->
             <div id="bypassTab" class="tab-content active">
                 <div class="form-group">
                     <label>เลือกตัวรันที่ต้องการรับคีย์</label>
@@ -363,7 +424,7 @@
                 </div>
             </div>
 
-            <!-- Script Finder Tab -->
+            <!-- Script Finder Tab Content -->
             <div id="scriptTab" class="tab-content">
                 <div class="form-group">
                     <label>ระบุชื่อแมพหรือชื่อเกม (Roblox)</label>
@@ -398,6 +459,16 @@
             </div>
         </div>
 
+        <!-- Guide Box -->
+        <div class="guide-box">
+            <h3 id="guideTitle"><i class="fa-solid fa-book"></i> วิธีใช้งานระบบหาคีย์</h3>
+            <ol id="guideSteps">
+                <li>เลือกค่ายตัวรันเกมที่คุณใช้งานอยู่ในช่องตัวเลือก</li>
+                <li>ไปก๊อปปี้ลิงก์รับคีย์จากตัวรันเกมของคุณมาวางลงในช่องป้อนลิงก์</li>
+                <li>กดปุ่มสีแดงเพื่อเริ่มระบบข้ามลิงก์และแสดงคีย์ใช้งาน</li>
+            </ol>
+        </div>
+
         <!-- Contact Box -->
         <div class="contact-box">
             <h3><i class="fa-solid fa-headset"></i> ติดต่อผู้พัฒนา / ช่องทางติดตาม</h3>
@@ -417,12 +488,27 @@
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
+            const guideTitle = document.getElementById('guideTitle');
+            const guideSteps = document.getElementById('guideSteps');
+            
             if (tabName === 'bypass') {
                 document.getElementById('btn-bypass').classList.add('active');
                 document.getElementById('bypassTab').classList.add('active');
+                guideTitle.innerHTML = `<i class="fa-solid fa-book"></i> วิธีใช้งานระบบหาคีย์`;
+                guideSteps.innerHTML = `
+                    <li>เลือกค่ายตัวรันเกมที่คุณใช้งานอยู่ในช่องตัวเลือก</li>
+                    <li>ไปก๊อปปี้ลิงก์รับคีย์จากตัวรันเกมของคุณมาวางลงในช่องป้อนลิงก์</li>
+                    <li>กดปุ่มสีแดงเพื่อเริ่มระบบข้ามลิงก์และแสดงคีย์ใช้งาน</li>
+                `;
             } else {
                 document.getElementById('btn-script').classList.add('active');
                 document.getElementById('scriptTab').classList.add('active');
+                guideTitle.innerHTML = `<i class="fa-solid fa-graduation-cap"></i> วิธีค้นหาสคริปต์ Auto`;
+                guideSteps.innerHTML = `
+                    <li>พิมพ์ระบุชื่อแมพ Roblox ที่ต้องการหาสคริปต์ในช่องรับข้อมูล</li>
+                    <li>เลือกฟังก์ชันเสริมหลักที่คุณอยากให้ทำงาน (เช่น เลือกเน้นฟาร์มเวล)</li>
+                    <li>กดปุ่มเพื่อดึงโหลดโค้ดสคริปต์เวอร์ชันล่าสุดไปใช้งานได้ทันที</li>
+                `;
             }
         }
 
@@ -487,5 +573,5 @@
         }
     </script>
 </body>
-    </html>
+                    </html>
 
