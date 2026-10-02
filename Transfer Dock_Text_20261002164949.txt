@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KL หาคีย์ - ระบบรับคีย์และสคริปต์อัตโนมัติ</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    
+    <style>
+        :root {
+            --bg-dark: #0f111a;
+            --card-dark: #161925;
+            --primary-color: #ff3e3e; 
+            --primary-hover: #e02f2f;
+            --text-main: #ffffff;
+            --text-muted: #8b949e;
+            --success-color: #2ecc71;
+            --discord-color: #5865F2;
+            --tiktok-color: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brand-header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        .brand-header h1 span {
+            color: var(--primary-color);
+            text-shadow: 0 0 15px rgba(255, 62, 62, 0.4);
+        }
+
+        .brand-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        /* Welcome Announcement Box */
+        .welcome-box {
+            background: rgba(255, 62, 62, 0.05);
+            border: 1px solid rgba(255, 62, 62, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .welcome-box p {
+            color: #ffb3b3;
+            font-size: 1rem;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .welcome-box i {
+            color: var(--primary-color);
+            margin-right: 6px;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--card-dark);
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #25293d;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: var(--text-main);
+            box-shadow: 0 4px 12px rgba(255, 62, 62, 0.25);
+        }
+
+        .content-card {
+            background: var(--card-dark);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid #25293d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            background: #1c2030;
+            border: 1px solid #2d334a;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-action:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            margin-top: 25px;
+            background: #0f111a;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px dashed #3a415a;
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .result-string {
+            background: #1c2030;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            word-break: break-all;
+            color: #569cd6;
+            margin-bottom: 12px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .btn-copy {
+            background: #2d334a;
+            border: none;
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--primary-color);
+        }
+
+        .loader i {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Guide & Info Section */
+        .guide-box {
+            background: #111420;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #1f2336;
+            margin-bottom: 20px;
+        }
+
+        .guide-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guide-box ol {
+            padding-left: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .guide-box li {
+            margin-bottom: 6px;
+        }
+
+        /* Contact & Community Section */
+        .contact-box {
+            background: var(--card-dark);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #25293d;
+            text-align: center;
+        }
+
+        .contact-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .social-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, filter 0.2s;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .social-btn.discord {
+            background: var(--discord-color);
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.2);
+        }
+
+        .social-btn.tiktok {
+            background: var(--tiktok-color);
+            border: 1px solid #333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--success-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.4s;
+            opacity: 0;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+        <!-- Brand Header -->
+        <div class="brand-header">
+            <h1><span>KL</span> หาคีย์</h1>
+            <p>ระบบข้ามลิงก์รับคีย์ตัวรัน และค้นหาสคริปต์อัตโนมัติ</p>
+        </div>
+
+        <!-- Welcome Message for KLA -->
+        <div class="welcome-box">
+ สวัสดีชาว KLA ทุกท่าน ยินดีต้อนรับและขอขอบคุณที่เข้ามาใช้สคริปต์/เว็บไซต์ของเราครับ
+ Bypass Key ตัวรัน
+
+
+ ค้นหาสคริปต์ Auto
+
+เลือกตัวรันที่ต้องการรับคีย์
+Fluxus Android / PC
+Delta Exploit
+Codex Executor
+Arceus X Neo
+
+
+วางลิงก์รับคีย์จากตัวรันของคุณ
+ เริ่มระบบหาคีย์ออโต้
+ กำลังประมวลผลข้ามลิงก์...
+รับคีย์สำเร็จ! (Simulation)
+
+KL-KEY-XXXX
+
+ คัดลอกคีย์ไปใช้
+
+
+ระบุชื่อแมพหรือชื่อเกม (Roblox)
+ฟังก์ชันการทำงานหลัก
+Auto Farm + Level
+Raid & Dungeon Hub
+PVP Mode & Aimlock
+
+
+
+ ค้นหาสคริปต์ที่ดีที่สุด
+ กำลังค้นหาคลังสคริปต์ Auto...
+เจอสคริปต์สำเร็จ!
+
+loadstring(game:HttpGet(...))()
+
+ คัดลอกสคริปต์
+
+
+
+ วิธีใช้งานระบบหาคีย์
+
+เลือกค่ายตัวรันเกมที่คุณใช้งานอยู่ในช่องตัวเลือก
+ไปก๊อปปี้ลิงก์รับคีย์จากตัวรันเกมของคุณมาวางลงในช่องป้อนลิงก์
+กดปุ่มสีแดงเพื่อเริ่มระบบข้ามลิงก์และแสดงคีย์ใช้งาน
+
+ ติดต่อผู้พัฒนา / ช่องทางติดตาม
+
+
+ เข้าร่วมเซิร์ฟเวอร์ Discord ของเรา
+
+
+ ติดตามเราบน TikTok (ต.ต)
+
+
+
+function switchTab(tabName) {
+document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+const guideTitle = document.getElementById('guideTitle');
+const guideSteps = document.getElementById('guideSteps');
+if (tabName === 'bypass') {
+document.getElementById('btn-bypass').classList.add('active');
+document.getElementById('bypassTab').classList.add('active');
+guideTitle.innerHTML = <i class="fa-solid fa-book"></i> วิธีใช้งานระบบหาคีย์;
+guideSteps.innerHTML = <li>เลือกค่ายตัวรันเกมที่คุณใช้งานอยู่ในช่องตัวเลือก</li> <li>ไปก๊อปปี้ลิงก์รับคีย์จากตัวรันเกมของคุณมาวางลงในช่องป้อนลิงก์</li> <li>กดปุ่มสีแดงเพื่อเริ่มระบบข้ามลิงก์และแสดงคีย์ใช้งาน</li>;
+} else {
+document.getElementById('btn-script').classList.add('active');
+document.getElementById('scriptTab').classList.add('active');
+guideTitle.innerHTML = <i class="fa-solid fa-graduation-cap"></i> วิธีค้นหาสคริปต์ Auto;
+guideSteps.innerHTML = <li>พิมพ์ระบุชื่อแมพ Roblox ที่ต้องการหาสคริปต์ในช่องรับข้อมูล</li> <li>เลือกฟังก์ชันเสริมหลักที่คุณอยากให้ทำงาน (เช่น เลือกเน้นฟาร์มเวล)</li> <li>กดปุ่มเพื่อดึงโหลดโค้ดสคริปต์เวอร์ชันล่าสุดไปใช้งานได้ทันที</li>;
+}
+}
+function showNotification(message) {
+const container = document.getElementById('toastContainer');
+const toast = document.createElement('div');
+toast.className = 'toast';
+toast.innerHTML = <i class="fa-solid fa-circle-check"></i> ${message};
+container.appendChild(toast);
+setTimeout(() => toast.classList.add('show'), 50);
+setTimeout(() => {
+toast.classList.remove('show');
+setTimeout(() => toast.remove(), 400);
+}, 3000);
+}
+function processBypass() {
+if(!document.getElementById('keyUrl').value) {
+alert('กรุณาใส่ลิงก์คีย์ก่อนครับ');
+return;
+}
+const loader = document.getElementById('bypassLoader');
+const resultBox = document.getElementById('bypassResult');
+resultBox.style.display = 'none';
+loader.style.display = 'block';
+setTimeout(() => {
+loader.style.display = 'none';
+resultBox.style.display = 'block';
+const exe = document.getElementById('executorSelect').value;
+document.getElementById('keyOutput').innerText = KL-${exe.toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()};
+}, 1500);
+}
+function processScriptFinder() {
+const gameName = document.getElementById('gameName').value;
+if(!gameName) {
+alert('กรุณากรอกชื่อแมพเกมก่อนครับ');
+return;
+}
+const loader = document.getElementById('scriptLoader');
+const resultBox = document.getElementById('scriptResult');
+resultBox.style.display = 'none';
+loader.style.display = 'block';
+setTimeout(() => {
+loader.style.display = 'none';
+resultBox.style.display = 'block';
+const type = document.getElementById('scriptType').value;
+document.getElementById('scriptOutput').innerText = _G.AutoKey = true;\n_G.Mode = "${type}";\nloadstring(game:HttpGet("https://githubusercontent.com{gameName.replace(/\s+/g, '')}"))();;
+}, 1500);
+}
+function copyText(elementId) {
+navigator.clipboard.writeText(document.getElementById(elementId).innerText).then(() => {
+showNotification("คัดลอกไปยังคลิปบอร์ดแล้ว!");
+});
+}
