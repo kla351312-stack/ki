@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KL หาคีย์ - ระบบรับคีย์และสคริปต์อัตโนมัติ</title>
     <!-- Google Fonts & Font Awesome Icons -->
-    <link href="https://googleapis.com" rel="stylesheet">
-    <link rel="stylesheet" href="https://cloudflare.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
@@ -328,6 +328,7 @@
         </div>
 
         <div class="content-card">
+            <!-- Bypass Tab -->
             <div id="bypassTab" class="tab-content active">
                 <div class="form-group">
                     <label>เลือกตัวรันที่ต้องการรับคีย์</label>
@@ -350,99 +351,141 @@
                     <i class="fa-solid fa-circle-notch"></i> กำลังประมวลผลข้ามลิงก์...
                 </div>
 
-รับคีย์สำเร็จ! (Simulation)
+                <div class="result-box" id="bypassResult">
+                    <div class="result-header">
+                        <span>รับคีย์สำเร็จ! (Simulation)</span>
+                        <i class="fa-solid fa-check" style="color: var(--success-color);"></i>
+                    </div>
+                    <div class="result-string" id="keyOutput">KL-KEY-XXXX</div>
+                    <button class="btn-copy" onclick="copyText('keyOutput')">
+                        <i class="fa-solid fa-copy"></i> คัดลอกคีย์ไปใช้
+                    </button>
+                </div>
+            </div>
 
-KL-KEY-XXXX
+            <!-- Script Finder Tab -->
+            <div id="scriptTab" class="tab-content">
+                <div class="form-group">
+                    <label>ระบุชื่อแมพหรือชื่อเกม (Roblox)</label>
+                    <input type="text" id="gameName" class="form-control" placeholder="เช่น Blox Fruits, Pet Simulator 99">
+                </div>
+                <div class="form-group">
+                    <label>ฟังก์ชันการทำงานหลัก</label>
+                    <select id="scriptType" class="form-control">
+                        <option value="Auto Farm + Level">Auto Farm + Level</option>
+                        <option value="Raid & Dungeon Hub">Raid & Dungeon Hub</option>
+                        <option value="PVP Mode & Aimlock">PVP Mode & Aimlock</option>
+                    </select>
+                </div>
+                <button class="btn-action" onclick="processScriptFinder()">
+                    <i class="fa-solid fa-magnifying-glass"></i> ค้นหาสคริปต์ที่ดีที่สุด
+                </button>
 
- คัดลอกคีย์ไปใช้
+                <div class="loader" id="scriptLoader">
+                    <i class="fa-solid fa-circle-notch"></i> กำลังค้นหาคลังสคริปต์ Auto...
+                </div>
 
+                <div class="result-box" id="scriptResult">
+                    <div class="result-header">
+                        <span>เจอสคริปต์สำเร็จ!</span>
+                        <i class="fa-solid fa-check" style="color: var(--success-color);"></i>
+                    </div>
+                    <div class="result-string" id="scriptOutput">loadstring(game:HttpGet(...))()</div>
+                    <button class="btn-copy" onclick="copyText('scriptOutput')">
+                        <i class="fa-solid fa-copy"></i> คัดลอกสคริปต์
+                    </button>
+                </div>
+            </div>
+        </div>
 
-ระบุชื่อแมพหรือชื่อเกม (Roblox)
-ฟังก์ชันการทำงานหลัก
-Auto Farm + Level
-Raid & Dungeon Hub
-PVP Mode & Aimlock
+        <!-- Contact Box -->
+        <div class="contact-box">
+            <h3><i class="fa-solid fa-headset"></i> ติดต่อผู้พัฒนา / ช่องทางติดตาม</h3>
+            <div class="social-buttons">
+                <a href="#" class="social-btn discord" target="_blank">
+                    <i class="fa-brands fa-discord"></i> เข้าร่วมเซิร์ฟเวอร์ Discord ของเรา
+                </a>
+                <a href="#" class="social-btn tiktok" target="_blank">
+                    <i class="fa-brands fa-tiktok"></i> ติดตามเราบน TikTok (ต.ต)
+                </a>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tabName === 'bypass') {
+                document.getElementById('btn-bypass').classList.add('active');
+                document.getElementById('bypassTab').classList.add('active');
+            } else {
+                document.getElementById('btn-script').classList.add('active');
+                document.getElementById('scriptTab').classList.add('active');
+            }
+        }
 
+        function showNotification(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${message}`;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
 
- ค้นหาสคริปต์ที่ดีที่สุด
- กำลังค้นหาคลังสคริปต์ Auto...
-เจอสคริปต์สำเร็จ!
+        function processBypass() {
+            if(!document.getElementById('keyUrl').value) {
+                alert('กรุณาใส่ลิงก์คีย์ก่อนครับ');
+                return;
+            }
+            const loader = document.getElementById('bypassLoader');
+            const resultBox = document.getElementById('bypassResult');
+            
+            resultBox.style.display = 'none';
+            loader.style.display = 'block';
+            
+            setTimeout(() => {
+                loader.style.display = 'none';
+                resultBox.style.display = 'block';
+                const exe = document.getElementById('executorSelect').value;
+                document.getElementById('keyOutput').innerText = `KL-${exe.toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+            }, 1500);
+        }
 
-loadstring(game:HttpGet(...))()
+        function processScriptFinder() {
+            const gameName = document.getElementById('gameName').value;
+            if(!gameName) {
+                alert('กรุณากรอกชื่อแมพเกมก่อนครับ');
+                return;
+            }
+            const loader = document.getElementById('scriptLoader');
+            const resultBox = document.getElementById('scriptResult');
+            
+            resultBox.style.display = 'none';
+            loader.style.display = 'block';
+            
+            setTimeout(() => {
+                loader.style.display = 'none';
+                resultBox.style.display = 'block';
+                const type = document.getElementById('scriptType').value;
+                const formattedName = gameName.replace(/\s+/g, '').toLowerCase();
+                document.getElementById('scriptOutput').innerText = `_G.AutoKey = true;\n_G.Mode = "${type}";\nloadstring(game:HttpGet("https://raw.githubusercontent.com/script/${formattedName}/main.lua"))();`;
+            }, 1500);
+        }
 
- คัดลอกสคริปต์
+        function copyText(elementId) {
+            navigator.clipboard.writeText(document.getElementById(elementId).innerText).then(() => {
+                showNotification("คัดลอกไปยังคลิปบอร์ดแล้ว!");
+            });
+        }
+    </script>
+</body>
+    </html>
 
-
-
- ติดต่อผู้พัฒนา / ช่องทางติดตาม
-
-
- เข้าร่วมเซิร์ฟเวอร์ Discord ของเรา
-
-
- ติดตามเราบน TikTok (ต.ต)
-
-
-
-function switchTab(tabName) {
-document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-if (tabName === 'bypass') {
-document.getElementById('btn-bypass').classList.add('active');
-document.getElementById('bypassTab').classList.add('active');
-} else {
-document.getElementById('btn-script').classList.add('active');
-document.getElementById('scriptTab').classList.add('active');
-}
-}
-function showNotification(message) {
-const container = document.getElementById('toastContainer');
-const toast = document.createElement('div');
-toast.className = 'toast';
-toast.innerHTML = <i class="fa-solid fa-circle-check"></i> ${message};
-container.appendChild(toast);
-setTimeout(() => toast.classList.add('show'), 50);
-setTimeout(() => {
-toast.classList.remove('show');
-setTimeout(() => toast.remove(), 400);
-}, 3000);
-}
-function processBypass() {
-if(!document.getElementById('keyUrl').value) {
-alert('กรุณาใส่ลิงก์คีย์ก่อนครับ');
-return;
-}
-const loader = document.getElementById('bypassLoader');
-const resultBox = document.getElementById('bypassResult');
-resultBox.style.display = 'none';
-loader.style.display = 'block';
-setTimeout(() => {
-loader.style.display = 'none';
-resultBox.style.display = 'block';
-const exe = document.getElementById('executorSelect').value;
-document.getElementById('keyOutput').innerText = KL-${exe.toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()};
-}, 1500);
-}
-function processScriptFinder() {
-const gameName = document.getElementById('gameName').value;
-if(!gameName) {
-alert('กรุณากรอกชื่อแมพเกมก่อนครับ');
-return;
-}
-const loader = document.getElementById('scriptLoader');
-const resultBox = document.getElementById('scriptResult');
-resultBox.style.display = 'none';
-loader.style.display = 'block';
-setTimeout(() => {
-loader.style.display = 'none';
-resultBox.style.display = 'block';
-const type = document.getElementById('scriptType').value;
-document.getElementById('scriptOutput').innerText = _G.AutoKey = true;\n_G.Mode = "${type}";\nloadstring(game:HttpGet("https://githubusercontent.com{gameName.replace(/\s+/g, '')}"))();;
-}, 1500);
-}
-function copyText(elementId) {
-navigator.clipboard.writeText(document.getElementById(elementId).innerText).then(() => {
-showNotification("คัดลอกไปยังคลิปบอร์ดแล้ว!");
-});
-}
