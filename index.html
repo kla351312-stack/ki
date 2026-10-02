@@ -66,29 +66,6 @@
             margin-top: 5px;
         }
 
-        .welcome-box {
-            background: rgba(255, 62, 62, 0.05);
-            border: 1px solid rgba(255, 62, 62, 0.2);
-            border-radius: 12px;
-            padding: 15px 20px;
-            text-align: center;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 0.5s ease;
-        }
-
-        .welcome-box p {
-            color: #ffb3b3;
-            font-size: 1rem;
-            line-height: 1.5;
-            font-weight: 400;
-        }
-
-        .welcome-box i {
-            color: var(--primary-color);
-            margin-right: 6px;
-        }
-
         .tabs {
             display: flex;
             background: var(--card-dark);
@@ -240,33 +217,6 @@
             animation: spin 1s linear infinite;
         }
 
-        .guide-box {
-            background: #111420;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #1f2336;
-            margin-bottom: 20px;
-        }
-
-        .guide-box h3 {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .guide-box ol {
-            padding-left: 20px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .guide-box li {
-            margin-bottom: 6px;
-        }
-
         .contact-box {
             background: var(--card-dark);
             border-radius: 12px;
@@ -368,27 +318,38 @@
             <p>ระบบข้ามลิงก์รับคีย์ตัวรัน และค้นหาสคริปต์อัตโนมัติ</p>
         </div>
 
-        <div class="welcome-box">
-            <p><i class="fa-solid fa-heart"></i> สวัสดีชาว KLA ทุกท่าน ยินดีต้อนรับและขอขอบคุณที่เข้ามาใช้สคริปต์/เว็บไซต์ของเราครับ</p>
+        <div class="tabs">
+            <button class="tab-btn active" id="btn-bypass" onclick="switchTab('bypass')">
+                <i class="fa-solid fa-key"></i> Bypass Key ตัวรัน
+            </button>
+            <button class="tab-btn" id="btn-script" onclick="switchTab('script')">
+                <i class="fa-solid fa-code"></i> ค้นหาสคริปต์ Auto
+            </button>
         </div>
 
-        <div class="tabs">
-ใช้โค้ดอย่างระมัดระวัง
- Bypass Key ตัวรัน
+        <div class="content-card">
+            <div id="bypassTab" class="tab-content active">
+                <div class="form-group">
+                    <label>เลือกตัวรันที่ต้องการรับคีย์</label>
+                    <select id="executorSelect" class="form-control">
+                        <option value="Fluxus">Fluxus Android / PC</option>
+                        <option value="Delta">Delta Exploit</option>
+                        <option value="Codex">Codex Executor</option>
+                        <option value="Arceus X">Arceus X Neo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>วางลิงก์รับคีย์จากตัวรันของคุณ</label>
+                    <input type="url" id="keyUrl" class="form-control" placeholder="https://linkvertise.com.....">
+                </div>
+                <button class="btn-action" onclick="processBypass()">
+                    <i class="fa-solid fa-bolt"></i> เริ่มระบบหาคีย์ออโต้
+                </button>
 
+                <div class="loader" id="bypassLoader">
+                    <i class="fa-solid fa-circle-notch"></i> กำลังประมวลผลข้ามลิงก์...
+                </div>
 
- ค้นหาสคริปต์ Auto
-
-เลือกตัวรันที่ต้องการรับคีย์
-Fluxus Android / PC
-Delta Exploit
-Codex Executor
-Arceus X Neo
-
-
-วางลิงก์รับคีย์จากตัวรันของคุณ
- เริ่มระบบหาคีย์ออโต้
- กำลังประมวลผลข้ามลิงก์...
 รับคีย์สำเร็จ! (Simulation)
 
 KL-KEY-XXXX
@@ -414,12 +375,6 @@ loadstring(game:HttpGet(...))()
 
 
 
- วิธีใช้งานระบบหาคีย์
-
-เลือกค่ายตัวรันเกมที่คุณใช้งานอยู่ในช่องตัวเลือก
-ไปก๊อปปี้ลิงก์รับคีย์จากตัวรันเกมของคุณมาวางลงในช่องป้อนลิงก์
-กดปุ่มสีแดงเพื่อเริ่มระบบข้ามลิงก์และแสดงคีย์ใช้งาน
-
  ติดต่อผู้พัฒนา / ช่องทางติดตาม
 
 
@@ -433,18 +388,12 @@ loadstring(game:HttpGet(...))()
 function switchTab(tabName) {
 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-const guideTitle = document.getElementById('guideTitle');
-const guideSteps = document.getElementById('guideSteps');
 if (tabName === 'bypass') {
 document.getElementById('btn-bypass').classList.add('active');
 document.getElementById('bypassTab').classList.add('active');
-guideTitle.innerHTML = <i class="fa-solid fa-book"></i> วิธีใช้งานระบบหาคีย์;
-guideSteps.innerHTML = <li>เลือกค่ายตัวรันเกมที่คุณใช้งานอยู่ในช่องตัวเลือก</li> <li>ไปก๊อปปี้ลิงก์รับคีย์จากตัวรันเกมของคุณมาวางลงในช่องป้อนลิงก์</li> <li>กดปุ่มสีแดงเพื่อเริ่มระบบข้ามลิงก์และแสดงคีย์ใช้งาน</li>;
 } else {
 document.getElementById('btn-script').classList.add('active');
 document.getElementById('scriptTab').classList.add('active');
-guideTitle.innerHTML = <i class="fa-solid fa-graduation-cap"></i> วิธีค้นหาสคริปต์ Auto;
-guideSteps.innerHTML = <li>พิมพ์ระบุชื่อแมพ Roblox ที่ต้องการหาสคริปต์ในช่องรับข้อมูล</li> <li>เลือกฟังก์ชันเสริมหลักที่คุณอยากให้ทำงาน (เช่น เลือกเน้นฟาร์มเวล)</li> <li>กดปุ่มเพื่อดึงโหลดโค้ดสคริปต์เวอร์ชันล่าสุดไปใช้งานได้ทันที</li>;
 }
 }
 function showNotification(message) {
